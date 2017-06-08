@@ -12,10 +12,10 @@ build: build-dep webhookd
 build-dep:
 	go get -d -t ./...
 
-webhookd:
+webhookd: src/webhookd/*
 	go build -o $(BINARY) $@
 
-listen:
+listen: src/listen/*
 	go build $@
 
 clean:
