@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func queueMessageFromGithub(p GithubPayload) (m MQMessage) {
-	m.Version = "0.0"
+	m.Version = MQMessageVersion
 	m.Repository = p.Repository.FullName
 	m.Branch = p.Repository.DefaultBranch
 	m.Commit = p.HeadCommit.TreeID
@@ -72,7 +73,7 @@ func githubHandler(writer http.ResponseWriter, reader *http.Request) {
 
 	/* verify signature */
 	signature := reader.Header.Get("X-Hub-Signature")
-	err = checkGithubSignature(rawPayload, signature, CONFIG.GithubSecret)
+	err := checkGithubSignature(rawPayload, signature, CONFIG.GithubSecret)
 	if err != nil {
 		/* 400 Bad Request */
 		http.Error(writer, http.StatusText(400), 400)
@@ -81,7 +82,7 @@ func githubHandler(writer http.ResponseWriter, reader *http.Request) {
 	}
 
 	/* decode payload */
-	payload := GithubPayload
+	var payload GithubPayload
 	err = json.Unmarshal([]byte(rawPayload), &payload)
 	if err != nil {
 		http.Error(writer, http.StatusText(400), 400)
@@ -125,7 +126,7 @@ func checkGithubSignature(rawPayload string, signature string, secret string) (e
 	}
 
 	hash := hmac.New(sha1.New, []byte(secret))
-		_, _ = hash.Write(rawPayload)
+	_, _ = hash.Write([]byte(rawPayload))
 	expectedMAC := hash.Sum(nil)
 	if ! hmac.Equal(requestMAC, expectedMAC) {
 		return fmt.Errorf("invalid secret")

@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+const MQMessageVersion string = "0.0"
+
 var MQCONFIG MQConfig
 
 type MQMessage struct {

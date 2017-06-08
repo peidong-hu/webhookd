@@ -13,7 +13,7 @@ type TestPayload struct {
 }
 
 func queueMessageFromTest(p TestPayload) (m MQMessage) {
-	m.Version = "0.0"
+	m.Version = MQMessageVersion
 	m.Repository = p.Repository
 	m.Branch = p.Branch
 	m.Commit = "cafebabe"
