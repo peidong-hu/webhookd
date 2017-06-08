@@ -1,0 +1,9 @@
+{
+    "version": "0.0",
+    "repository": "my-repository",
+    "branch": "dev",
+    "commit": "a37484638da5e0ff7c205ecb91c9ace92e83c32c",
+    "message": "Some commit message",
+    "author": "Author Name <author@name.tld",
+    "trigger": "Trigger (Git, CI, ...)"
+}

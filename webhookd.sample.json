@@ -1,0 +1,14 @@
+{
+    "address": "0.0.0.0",
+    "port": 8080,
+
+    "mq": {
+        "type": "AMPQ 0-9-1",
+        "protocol": "amqp",
+        "host": "127.0.0.1",
+        "port": 5672,
+        "user": "username",
+        "password": "password",
+        "exchange": "my-exchange"
+    }
+}
