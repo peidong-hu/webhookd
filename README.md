@@ -9,6 +9,8 @@ Message Broker which accepts Web Hooks from Jenkins, GitLab, GitHub, Gitea, Trav
 ## Building
 Run `make build` or execute `go build webhookd` manually.
 
+Alternatively, you can build your own Docker image with the supplied `Dockerfile`. Please note this Dockerfile uses the new [multi-stage builds feature](https://docs.docker.com/engine/userguide/eng-image/multistage-build/) and therefore requires at least version 17.05 of Docker.
+
 ## Configuration
 A sample configuration is provided in `webhookd.sample.json`
 
