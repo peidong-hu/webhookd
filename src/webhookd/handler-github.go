@@ -22,8 +22,14 @@ func queueMessageFromGithub(p GithubPayload) (m MQMessage) {
 	return m
 }
 
+type GithubHandler struct {
+	Secret string
+	Route string
+	Exchange string
+	HandlerFunc func(w http.ResponseWriter, r *http.Request)
+}
 
-func githubHandler(writer http.ResponseWriter, reader *http.Request) {
+func (h *GithubHandler) githubHandler(writer http.ResponseWriter, reader *http.Request) {
 
 	/* check request type */
 	if reader.Method != "POST" {
@@ -73,7 +79,7 @@ func githubHandler(writer http.ResponseWriter, reader *http.Request) {
 
 	/* verify signature */
 	signature := reader.Header.Get("X-Hub-Signature")
-	err := checkGithubSignature(rawPayload, signature, CONFIG.GithubSecret)
+	err := checkGithubSignature(rawPayload, signature, h.Secret)
 	if err != nil {
 		/* 400 Bad Request */
 		http.Error(writer, http.StatusText(400), 400)

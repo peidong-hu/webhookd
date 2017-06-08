@@ -1,6 +1,7 @@
 {
     "address": "0.0.0.0",
     "port": 8080,
+    "route-prefix": "/webhooks",
 
     "mq": {
         "type": "AMPQ 0-9-1",
@@ -10,5 +11,30 @@
         "user": "username",
         "password": "password",
         "exchange": "my-exchange"
+    },
+
+    "hooks": {
+        "github": [
+            {
+                "route": "",
+                "secret": "",
+                "exchange": ""
+            },
+            {
+                "route": "/github/my-other-repo",
+                "secret": "cafebabe",
+                "exchange": "my-other-exchange"
+            }
+        ],
+        "travis": [
+            {
+                "route": "",
+                "exchange": ""
+            },
+            {
+                "route": "/travis-ci/my-other-repo",
+                "exchange": "my-other-exchange"
+            }
+        ]
     }
 }

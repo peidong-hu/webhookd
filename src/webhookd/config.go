@@ -16,15 +16,24 @@ type MQConfig struct {
 	Exchange string `json:"exchange"`
 }
 
-type PostrunConfig struct {
-	Path string `json:"path"`
+type HooksConfig struct {
+	Github []struct {
+		Route string `json:"route"`
+		Secret string `json:"secret"`
+		Exchange string `json:"exchange"`
+	} `json:"github"`
+	Travis []struct {
+		Route string `json:"route"`
+		Exchange string `json:"exchange"`
+	} `json:"travis"`
 }
 
 type Config struct {
 	Address string `json:"address"`
 	Port int `json:"port"`
-	GithubSecret string `json:"githubsecret"`
+	RoutePrefix string `json:"route-prefix"`
 	MQ MQConfig `json:"mq"`
+	Hooks HooksConfig `json:"hooks"`
 }
 
 func loadConfig(file string) (config Config, err error) {
@@ -46,7 +55,7 @@ func loadConfig(file string) (config Config, err error) {
 }
 
 func validateConfig(c Config) (err error) {
-	// if ! c {
+	// if (Config{}) == c {
 	// 	return errors.New("validateConfig: Empty Configuration struct")
 	// }
 

@@ -15,6 +15,40 @@ var TESTHOOK bool
 var MQCONNECTION *amqp.Connection
 var MQCHANNEL *amqp.Channel
 
+
+func setRoutes(routePrefix string, h HooksConfig) {
+
+	/* GitHub */
+	var defaultGithubRoute = h.Github[0].Route
+	var defaultGithubSecret = h.Github[0].Secret
+	var defaultGithubExchange = h.Github[0].Exchange
+
+	if len(h.Github) > 1 {
+		for i := range h.Github {
+			var g GithubHandler
+			e := h.Github[i]
+			if e.Route == "" {
+				g.Route = routePrefix + defaultGithubRoute
+			} else {
+				g.Route = routePrefix + e.Route
+			}
+
+			g.Secret = e.Secret
+			if g.Secret == "" {
+				g.Secret = defaultGithubSecret
+			}
+
+			g.Exchange = e.Exchange
+			if g.Exchange == "" {
+				g.Exchange = defaultGithubExchange
+			}
+
+			http.HandleFunc(g.Route, g.HandlerFunc)
+		}
+	}
+
+}
+
 func main() {
 	flag.IntVar(&VERBOSITY, "v", 1, "verbosity to use")
 	flag.BoolVar(&TESTHOOK, "testhook", true, "enable test webhook at /webhooks/test")
