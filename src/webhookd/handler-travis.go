@@ -1,13 +1,24 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"encoding/json"
 	"github.com/jacksgt/travishook"
 )
 
 const defaultTravisConfigServer string = "api.travis-ci.org"
+
+func queueMessageFromTravis(p travishook.WebhookPayload) (m MQMessage) {
+	m.Version = MQMessageVersion
+	m.Repository = p.Repository.Name
+	m.Branch = p.Branch
+	m.Commit = p.Commit
+	m.Message = p.Message
+	m.Author = p.AuthorName
+	m.Trigger = "Travis Successful Build"
+
+	return m
+}
 
 /*
 * Travis Webhook Delivery Format
@@ -85,13 +96,12 @@ func travisHandler(writer http.ResponseWriter, reader *http.Request) {
 	/* check build status */
 	if payload.Status == 0 && payload.StatusMessage == "Passed" {
 		/* build successful */
-		fmt.Println("Build successful")
 
-		//message := queueMessageFromTravis(payload)
-		message := "{ \"version\": \"0.1\" }"
+		rawMessage := queueMessageFromTravis(payload)
 
-		err := publishMessage(MQCHANNEL, message)
+		message, _ := json.Marshal(rawMessage)
 
+		err := publishMessage(MQCHANNEL, string(message))
 		if err != nil {
 			/* 500 Internal Server Error */
 			http.Error(writer, http.StatusText(500), 500)
@@ -100,7 +110,7 @@ func travisHandler(writer http.ResponseWriter, reader *http.Request) {
 		}
 
 	} else {
-		lg(2, "Build not successful - ignoring")
+		lg(2, "Ignoring failed build %s from %s", payload.Number, payload.Repository.Name)
 	}
 
 	/* close HTTP stream */
