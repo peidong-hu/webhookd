@@ -4,5 +4,5 @@ go:
   - 1.7.x
   - master
 script:
-  - go get -t ./...
-  - go build webhookd
+  - make build-dep
+  - make webhookd
