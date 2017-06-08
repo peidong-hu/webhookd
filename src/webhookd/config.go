@@ -23,6 +23,7 @@ type PostrunConfig struct {
 type Config struct {
 	Address string `json:"address"`
 	Port int `json:"port"`
+	GithubSecret string `json:"githubsecret"`
 	MQ MQConfig `json:"mq"`
 }
 
