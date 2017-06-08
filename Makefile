@@ -15,5 +15,8 @@ build-dep:
 webhookd:
 	go build -o $(BINARY) $@
 
+listen:
+	go build $@
+
 clean:
-	rm -f $(BINARY)
+	rm -f $(BINARY) listen
