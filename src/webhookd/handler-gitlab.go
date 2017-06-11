@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+/* Gitlab Webhooks: https://docs.gitlab.com/ce/user/project/integrations/webhooks.html */
+
 type GitlabHandler struct {
 	Secret string
 	Route string

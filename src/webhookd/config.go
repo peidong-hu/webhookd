@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"encoding/json"
-	"github.com/davecgh/go-spew/spew"
+//	"github.com/davecgh/go-spew/spew"
 )
 
 type MQConfig struct {
@@ -26,6 +26,11 @@ type HooksConfig struct {
 		Route string `json:"route"`
 		Exchange string `json:"exchange"`
 	} `json:"travis"`
+	Gitlab []struct {
+		Route string `json:"route"`
+		Secret string `json:"secret"`
+		Exchange string `json:"exchange"`
+	} `json:"gitlab"`
 }
 
 type Config struct {
@@ -49,7 +54,7 @@ func loadConfig(file string) (config Config, err error) {
 		return config, err
 	}
 
-	spew.Dump(config)
+//	spew.Dump(config)
 
     return config, nil
 }

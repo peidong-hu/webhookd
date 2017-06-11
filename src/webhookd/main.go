@@ -47,6 +47,34 @@ func setRoutes(routePrefix string, h HooksConfig) {
 		}
 	}
 
+	/* Gitlab */
+	var defaultGitlabRoute = h.Gitlab[0].Route
+	var defaultGitlabSecret = h.Gitlab[0].Secret
+	var defaultGitlabExchange = h.Gitlab[0].Exchange
+
+	for i := range h.Gitlab {
+		var g GitlabHandler
+		e := h.Gitlab[i]
+		if e.Route == "" {
+			g.Route = routePrefix + defaultGitlabRoute
+		} else {
+			g.Route = routePrefix + e.Route
+		}
+
+		g.Secret = e.Secret
+		if g.Secret == "" {
+			g.Secret = defaultGitlabSecret
+		}
+
+		g.Exchange = e.Exchange
+		if g.Exchange == "" {
+			g.Exchange = defaultGitlabExchange
+		}
+
+		log.Printf("Assigning route %s to Gitlab Handler", g.Route)
+		http.HandleFunc(g.Route, g.HandlerFunc)
+	}
+
 }
 
 func main() {
@@ -64,6 +92,8 @@ func main() {
 	MQCONNECTION, MQCHANNEL = connectMQ(CONFIG.MQ)
 	defer MQCONNECTION.Close()
 	defer MQCHANNEL.Close()
+
+	setRoutes(CONFIG.RoutePrefix, CONFIG.Hooks)
 
 	if TESTHOOK {
 		/* register test webhook handler */
