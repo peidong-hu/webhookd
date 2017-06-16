@@ -1,18 +1,22 @@
-package main
+// +build ignore
+
+package demo
 
 import (
-	"net/http"
 	"encoding/json"
+	. "github.com/vision-it/webhookd/logging"
+	. "github.com/vision-it/webhookd/model"
+	"net/http"
 )
 
-type TestPayload struct {
+type testPayload struct {
 	Repository string `json:"repository"`
-	Branch string `json:"branch"`
-	Author string `json:"author"`
-	Message string `json:"message"`
+	Branch     string `json:"branch"`
+	Author     string `json:"author"`
+	Message    string `json:"message"`
 }
 
-func queueMessageFromTest(p TestPayload) (m MQMessage) {
+func queueMessageFromTest(p testPayload) (m MQMessage) {
 	m.Version = MQMessageVersion
 	m.Repository = p.Repository
 	m.Branch = p.Branch
@@ -25,7 +29,7 @@ func queueMessageFromTest(p TestPayload) (m MQMessage) {
 }
 
 func testHandler(writer http.ResponseWriter, reader *http.Request) {
-	lg(2, "%s - %s [%s]: %s\n",
+	Lg(2, "%s - %s [%s]: %s\n",
 		reader.Method,
 		reader.URL,
 		reader.Header.Get("Content-Type"),
@@ -37,7 +41,7 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 		/* 405 Method Not Allowed */
 		writer.Header().Set("Allow", "POST")
 		http.Error(writer, http.StatusText(405), 405)
-		lg(1, "405: %s - %s\n", reader.Method, reader.URL)
+		Lg(1, "405: %s - %s\n", reader.Method, reader.URL)
 		return
 	}
 
@@ -46,7 +50,7 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 	if contentType != "application/x-www-form-urlencoded" {
 		/* 415 Unsupported Media Type */
 		http.Error(writer, http.StatusText(415), 415)
-		lg(1, "415: %s - %s (Content-Type: %s)\n", reader.Method, reader.URL, contentType)
+		Lg(1, "415: %s - %s (Content-Type: %s)\n", reader.Method, reader.URL, contentType)
 		return
 	}
 
@@ -55,7 +59,7 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 	if rawPayload == "" {
 		/* 400 Bad Request */
 		http.Error(writer, http.StatusText(400), 400)
-		lg(1, "400: %s - %s (Empty Payload)\n", reader.Method, reader.URL)
+		Lg(1, "400: %s - %s (Empty Payload)\n", reader.Method, reader.URL)
 		return
 	}
 
@@ -64,7 +68,7 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 	err := json.Unmarshal([]byte(rawPayload), &payload)
 	if err != nil {
 		http.Error(writer, http.StatusText(400), 400)
-		lg(0, "400: %s - %s (Error decoding JSON: %s)\n", reader.Method, reader.URL, err.Error)
+		Lg(0, "400: %s - %s (Error decoding JSON: %s)\n", reader.Method, reader.URL, err.Error)
 		return
 	}
 
@@ -75,7 +79,7 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 	message, err := json.Marshal(rawMessage)
 	if err != nil {
 		http.Error(writer, http.StatusText(500), 500)
-		lg(0, "500: %s - %s (Error encoding JSON: %s)\n", reader.Method, reader.URL, err.Error)
+		Lg(0, "500: %s - %s (Error encoding JSON: %s)\n", reader.Method, reader.URL, err.Error)
 		return
 	}
 
@@ -83,7 +87,7 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 	err = publishMessage(MQCHANNEL, string(message))
 	if err != nil {
 		http.Error(writer, http.StatusText(500), 500)
-		lg(0, "500: %s - %s (Failed to publish message: %s)\n", reader.Method, reader.URL, err.Error)
+		Lg(0, "500: %s - %s (Failed to publish message: %s)\n", reader.Method, reader.URL, err.Error)
 		return
 	}
 

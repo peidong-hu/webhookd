@@ -1,9 +1,14 @@
+// +build ignore
+
 package main
 
 import (
-	"net/http"
 	"encoding/json"
 	"github.com/jacksgt/travishook"
+	"net/http"
+
+	. "github.com/vision-it/webhookd/logging"
+	. "github.com/vision-it/webhookd/model"
 )
 
 const defaultTravisConfigServer string = "api.travis-ci.org"
@@ -23,13 +28,13 @@ func queueMessageFromTravis(p travishook.WebhookPayload) (m MQMessage) {
 /*
 * Travis Webhook Delivery Format
 * https://docs.travis-ci.com/user/notifications/#Webhooks-Delivery-Format
-*/
+ */
 func travisHandler(writer http.ResponseWriter, reader *http.Request) {
 	lg(1, "%s - %s [%s]: %s\n",
-			reader.Method,
-			reader.URL,
-			reader.Header.Get("Content-Type"),
-			reader.FormValue("payload"),
+		reader.Method,
+		reader.URL,
+		reader.Header.Get("Content-Type"),
+		reader.FormValue("payload"),
 	)
 
 	/* check request type */
