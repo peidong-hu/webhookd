@@ -19,7 +19,8 @@ type GitlabHandler struct {
 	exchange string
 }
 
-func queueMessageFromGitlab(p GitlabPayload) (m MQMessage) {
+func queueMessageFromPayload(p GitlabPayload) string {
+	var m MQMessage
 	branchSlice := strings.Split(p.Ref, "/")
 	branch := branchSlice[len(branchSlice)-1]
 
@@ -30,20 +31,21 @@ func queueMessageFromGitlab(p GitlabPayload) (m MQMessage) {
 	m.Message = p.Commits[0].Message
 	m.Author = p.UserUsername
 	m.Trigger = "Gitlab Push"
-	return m
+
+	/* internal structure, no error message */
+	raw, _ := json.Marshal(&m)
+
+	return string(raw)
 }
 
-func NewHandler(route string, secret string, exchange string) (h *GitlabHandler) {
+/* generates a new Gitlab Handler */
+func New(route string, secret string, exchange string) (h *GitlabHandler) {
 	h = &GitlabHandler{
 		route:    route,
 		secret:   secret,
 		exchange: exchange,
 	}
 	return h
-}
-
-func (h *GitlabHandler) Route() string {
-	return h.route
 }
 
 func (h *GitlabHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Request) {
@@ -94,12 +96,10 @@ func (h *GitlabHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 		return
 	}
 
-	rawMessage := queueMessageFromGitlab(payload)
-
-	message, _ := json.Marshal(rawMessage)
+	message := queueMessageFromPayload(payload)
 
 	/* publish message */
-	err = mq.Publish(string(message), h.exchange)
+	err = mq.Publish(message, h.exchange)
 	if err != nil {
 		http.Error(writer, http.StatusText(500), 500)
 		Lg(0, "500: %s - %s (Failed to publish message: %s)\n", reader.Method, reader.URL, err.Error)

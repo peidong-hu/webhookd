@@ -1,13 +1,18 @@
-// +build ignore
-
 package demo
 
 import (
 	"encoding/json"
 	. "github.com/vision-it/webhookd/logging"
 	. "github.com/vision-it/webhookd/model"
+	"github.com/vision-it/webhookd/mq"
 	"net/http"
 )
+
+type DemoHandler struct {
+	secret   string
+	route    string
+	exchange string
+}
 
 type testPayload struct {
 	Repository string `json:"repository"`
@@ -16,7 +21,9 @@ type testPayload struct {
 	Message    string `json:"message"`
 }
 
-func queueMessageFromTest(p testPayload) (m MQMessage) {
+func queueMessageFromTest(p testPayload) string {
+	var m MQMessage
+
 	m.Version = MQMessageVersion
 	m.Repository = p.Repository
 	m.Branch = p.Branch
@@ -25,10 +32,23 @@ func queueMessageFromTest(p testPayload) (m MQMessage) {
 	m.Author = p.Author
 	m.Trigger = "Test-Webhook"
 
-	return m
+	/* internal structure, no error message */
+	raw, _ := json.Marshal(&m)
+
+	return string(raw)
 }
 
-func testHandler(writer http.ResponseWriter, reader *http.Request) {
+func New(route string, secret string, exchange string) (h *DemoHandler) {
+	h = &DemoHandler{
+		route:    route,
+		secret:   secret,
+		exchange: exchange,
+	}
+
+	return h
+}
+
+func (h *DemoHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Request) {
 	Lg(2, "%s - %s [%s]: %s\n",
 		reader.Method,
 		reader.URL,
@@ -64,7 +84,7 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 	}
 
 	/* json-decode payload */
-	var payload TestPayload
+	var payload testPayload
 	err := json.Unmarshal([]byte(rawPayload), &payload)
 	if err != nil {
 		http.Error(writer, http.StatusText(400), 400)
@@ -72,19 +92,10 @@ func testHandler(writer http.ResponseWriter, reader *http.Request) {
 		return
 	}
 
-	/* generate queue message */
-	rawMessage := queueMessageFromTest(payload)
-
-	/* convert struct to JSON string */
-	message, err := json.Marshal(rawMessage)
-	if err != nil {
-		http.Error(writer, http.StatusText(500), 500)
-		Lg(0, "500: %s - %s (Error encoding JSON: %s)\n", reader.Method, reader.URL, err.Error)
-		return
-	}
+	message := queueMessageFromTest(payload)
 
 	/* publish message to MQ */
-	err = publishMessage(MQCHANNEL, string(message))
+	err = mq.Publish(message, h.exchange)
 	if err != nil {
 		http.Error(writer, http.StatusText(500), 500)
 		Lg(0, "500: %s - %s (Failed to publish message: %s)\n", reader.Method, reader.URL, err.Error)
