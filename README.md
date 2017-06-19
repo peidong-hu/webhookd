@@ -27,7 +27,7 @@ A sample configuration is provided in `webhookd.sample.json`
 This repo contains a program called 'listen' which will read the same configuration file as 'webhookd' (because it uses the same credentials and options for the message queue) and act as a consumer on the other side of the message queue. You can build it with `make listen` or `go build listen`.
 It may also serve as an example on how to implement a consumer for the message queue in Go.
 
-Additionally, 'webhookd' has an integrated basic web hook for testing. It can be enabled on the command-line and accepts web hooks of the `x/www-url-form-encoded` type with a JSON payload. An example for this can be found in the `test/test-webhook.sh` script.
+Additionally, 'webhookd' has an integrated basic web hook for testing. It can be enabled via the config option `demo` (see `webhookd.sample.json`). An example for this can be found in the `test/demo-webhook.sh` script.
 
 ## License
 This software is licensed under the Expat (MIT) License. Check the `LICENSE` file.
