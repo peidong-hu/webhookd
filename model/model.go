@@ -8,7 +8,8 @@ const MQMessageVersion string = "0.0"
 
 type WebhookHandler interface {
 	Handler(http.ResponseWriter, *http.Request)
-	Route() string
+	SetRoute(string) error
+	GetRoute() string
 }
 
 type MQMessage struct {
