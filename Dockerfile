@@ -8,14 +8,15 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     git \
-    golang-go
+    golang-go \
+    make
 
-COPY src/webhookd/ /go/src/webhookd/
+COPY . /go/src/webhookd/
 
 WORKDIR /go/src/webhookd/
 
-RUN go get -t -d ./...
-RUN CGO_ENABLED=0 GOOS=linux go build webhookd
+RUN CGO_ENABLED=0 GOOS=linux \
+    make build-dep webhookd listener
 
 
 # Stage 2
@@ -24,4 +25,6 @@ FROM scratch
 EXPOSE 8080
 
 COPY --from=builder /go/src/webhookd/webhookd /webhookd
+COPY --from=builder /go/src/webhookd/listener /listener
+
 CMD ["/webhookd"]
