@@ -1,5 +1,4 @@
 /webhookd
-webhookd.json
-src/github.com/**
-src/gopkg.in/**
-/listen
+/webhookd.json
+/listener
+/bin/**
