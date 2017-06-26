@@ -11,7 +11,7 @@ Implemented webhooks:
 - [X] GitHub
 - [X] Travis
 - [X] GitLab
-- [ ] Gitea
+- [X] Gitea
 - [ ] Jenkins
 
 

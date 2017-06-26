@@ -35,6 +35,16 @@
                 "route": "/travis-ci/my-other-repo",
                 "exchange": "my-other-exchange"
             }
+        ],
+        "gitea": [
+            {
+                "route": "",
+                "exchange": ""
+            },
+            {
+                "route": "/gitea/my-repo",
+                "exchange": "my-exchange"
+            }
         ]
     }
 }

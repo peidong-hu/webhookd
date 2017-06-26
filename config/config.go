@@ -32,6 +32,11 @@ type HooksConfig struct {
 		Secret   string `json:"secret"`
 		Exchange string `json:"exchange"`
 	} `json:"gitlab"`
+	Gitea []struct {
+		Route    string `json:"route"`
+		Secret   string `json:"secret"`
+		Exchange string `json:"exchange"`
+	} `json:"gitea"`
 	Demo []struct {
 		Route    string `json:"route"`
 		Secret   string `json:"secret"`
