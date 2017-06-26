@@ -1,22 +1,23 @@
 #!/usr/bin/make
+
 .PHONY = build build-dep clean
 
-BINARY ?= webhookd
+SOURCEDIR=.
+SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
 
-# set GOPATH
-GOPATH := $(shell pwd)
-export GOPATH
+BIN ?= webhookd
 
 build: build-dep webhookd
 
 build-dep:
 	go get -d -t ./...
 
-webhookd: src/webhookd/*
-	go build -o $(BINARY) $@
+webhookd: $(SOURCES)
+	go build -o $(BIN)
 
-listen: src/listen/*
-	go build $@
+listener: listen/*.go
+	cd listen && go build -o ../listener
 
 clean:
-	rm -f $(BINARY) listen
+	go clean
+	rm -f $(BIN) listener
