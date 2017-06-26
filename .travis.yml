@@ -6,5 +6,6 @@ go:
   - 1.7.x
   - master
 script:
-  - make build
-  - make listen
+  - make build-dep
+  - make webhookd
+  - make listener
