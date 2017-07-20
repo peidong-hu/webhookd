@@ -24,6 +24,8 @@ FROM scratch
 
 EXPOSE 8080
 
+WORKDIR /
+
 COPY --from=builder /go/src/webhookd/webhookd /webhookd
 COPY --from=builder /go/src/webhookd/listener /listener
 
