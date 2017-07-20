@@ -21,6 +21,10 @@ func setRoutes(routePrefix string, h *HooksConfig) (mux *http.ServeMux) {
 }
 
 func setGitlabRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
+	if h.Gitlab == nil {
+		return
+	}
+
 	/* retrieve defaults from first field */
 	var defaultRoute = h.Gitlab[0].Route
 	var defaultSecret = h.Gitlab[0].Secret
@@ -53,6 +57,10 @@ func setGitlabRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
 }
 
 func setDemoRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
+	if h.Demo == nil {
+		return
+	}
+
 	/* retrieve defaults from first field */
 	var defaultRoute = h.Demo[0].Route
 	var defaultSecret = h.Demo[0].Secret
@@ -85,6 +93,10 @@ func setDemoRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
 }
 
 func setTravisRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
+	if h.Travis == nil {
+		return
+	}
+
 	/* retrieve defaults from first field */
 	var defaultRoute = h.Travis[0].Route
 	var defaultExchange = h.Travis[0].Exchange
@@ -111,6 +123,10 @@ func setTravisRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
 }
 
 func setGiteaRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
+	if h.Gitea == nil {
+		return
+	}
+
 	/* retrieve defaults from first field */
 	var defaultRoute = h.Gitea[0].Route
 	var defaultSecret = h.Gitea[0].Secret
