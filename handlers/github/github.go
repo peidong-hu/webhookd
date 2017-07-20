@@ -1,5 +1,3 @@
-// +build ignore
-
 package github
 
 import (
@@ -14,9 +12,12 @@ import (
 
 	. "github.com/vision-it/webhookd/logging"
 	. "github.com/vision-it/webhookd/model"
+	"github.com/vision-it/webhookd/mq"
 )
 
-func queueMessageFromGithub(p GithubPayload) (m MQMessage) {
+func queueMessageFromGithub(p GithubPayload) string {
+	var m MQMessage
+
 	m.Version = MQMessageVersion
 	m.Repository = p.Repository.FullName
 	m.Branch = p.Repository.DefaultBranch
@@ -24,7 +25,11 @@ func queueMessageFromGithub(p GithubPayload) (m MQMessage) {
 	m.Message = p.HeadCommit.Message
 	m.Author = p.HeadCommit.Author.Username
 	m.Trigger = "GitHub Push"
-	return m
+
+	/* internal structure, no error message */
+	raw, _ := json.Marshal(&m)
+
+	return string(raw)
 }
 
 type GithubHandler struct {
@@ -34,6 +39,16 @@ type GithubHandler struct {
 	exchange string
 }
 
+/* generates a new Github Handler */
+func New(route string, secret string, exchange string) (h *GithubHandler) {
+	h = &GithubHandler{
+		route:    route,
+		secret:   secret,
+		exchange: exchange,
+	}
+	return h
+}
+
 func (h *GithubHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Request) {
 
 	/* check request type */
@@ -41,7 +56,7 @@ func (h *GithubHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 		/* 405 Method Not Allowed */
 		writer.Header().Set("Allow", "POST")
 		http.Error(writer, http.StatusText(405), 405)
-		lg(1, "405: %s - %s\n", reader.Method, reader.URL)
+		Lg(1, "405: %s - %s\n", reader.Method, reader.URL)
 		return
 	}
 
@@ -51,7 +66,7 @@ func (h *GithubHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 	if event == "" || delivery == "" {
 		/* 400 Bad Request */
 		http.Error(writer, http.StatusText(400), 400)
-		lg(1, "400: %s - %s (Missing GitHub Header)\n", reader.Method, reader.URL)
+		Lg(1, "400: %s - %s (Missing GitHub Header)\n", reader.Method, reader.URL)
 		return
 	}
 
@@ -60,7 +75,7 @@ func (h *GithubHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 		/* thanks and goodbye */
 		writer.WriteHeader(200)
 		writer.Write([]byte("OK\n"))
-		lg(1, "Ignoring Event %s for %s", event, reader.URL)
+		Lg(1, "Ignoring Event %s for %s", event, reader.URL)
 		return
 	}
 
@@ -69,7 +84,7 @@ func (h *GithubHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 	if contentType != "application/x-www-form-urlencoded" {
 		/* 415 Unsupported Media Type */
 		http.Error(writer, http.StatusText(415), 415)
-		lg(1, "415: %s - %s (Content-Type: %s)\n", reader.Method, reader.URL, contentType)
+		Lg(1, "415: %s - %s (Content-Type: %s)\n", reader.Method, reader.URL, contentType)
 		return
 	}
 
@@ -78,17 +93,17 @@ func (h *GithubHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 	if rawPayload == "" {
 		/* 400 Bad Request */
 		http.Error(writer, http.StatusText(400), 400)
-		lg(1, "400: %s - %s (Empty Payload)\n", reader.Method, reader.URL)
+		Lg(1, "400: %s - %s (Empty Payload)\n", reader.Method, reader.URL)
 		return
 	}
 
 	/* verify signature */
 	signature := reader.Header.Get("X-Hub-Signature")
-	err := checkGithubSignature(rawPayload, signature, h.Secret)
+	err := checkGithubSignature(rawPayload, signature, h.secret)
 	if err != nil {
 		/* 400 Bad Request */
 		http.Error(writer, http.StatusText(400), 400)
-		lg(1, "400: %s - %s (Invalid signature)\n", reader.Method, reader.URL)
+		Lg(1, "400: %s - %s (Invalid signature)\n", reader.Method, reader.URL)
 		return
 	}
 
@@ -97,20 +112,18 @@ func (h *GithubHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 	err = json.Unmarshal([]byte(rawPayload), &payload)
 	if err != nil {
 		http.Error(writer, http.StatusText(400), 400)
-		lg(0, "400: %s - %s (Error decoding JSON: %s)\n", reader.Method, reader.URL, err)
+		Lg(0, "400: %s - %s (Error decoding JSON: %s)\n", reader.Method, reader.URL, err)
 		return
 	}
 
 	/* generate queue message */
-	rawMessage := queueMessageFromGithub(payload)
-
-	message, _ := json.Marshal(rawMessage)
+	message := queueMessageFromGithub(payload)
 
 	/* publish message */
-	err = publishMessage(MQCHANNEL, string(message))
+	err = mq.Publish(message, h.exchange)
 	if err != nil {
 		http.Error(writer, http.StatusText(500), 500)
-		lg(0, "500: %s - %s (Failed to publish message: %s)\n", reader.Method, reader.URL, err.Error)
+		Lg(0, "500: %s - %s (Failed to publish message: %s)\n", reader.Method, reader.URL, err.Error)
 		return
 	}
 

@@ -4,6 +4,7 @@ import (
 	. "github.com/vision-it/webhookd/config"
 	"github.com/vision-it/webhookd/handlers/demo"
 	"github.com/vision-it/webhookd/handlers/gitea"
+	"github.com/vision-it/webhookd/handlers/github"
 	"github.com/vision-it/webhookd/handlers/gitlab"
 	"github.com/vision-it/webhookd/handlers/travis"
 	"log"
@@ -51,6 +52,42 @@ func setGitlabRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
 		g := gitlab.New(r, s, e)
 
 		log.Printf("Route %s -> Gitlab Handler", r)
+		mux.Handle(r, g)
+	}
+
+}
+
+func setGithubRoutes(mux *http.ServeMux, routePrefix string, h *HooksConfig) {
+	if h.Github == nil {
+		return
+	}
+
+	/* retrieve defaults from first field */
+	var defaultRoute = h.Github[0].Route
+	var defaultSecret = h.Github[0].Secret
+	var defaultExchange = h.Github[0].Exchange
+
+	for _, v := range h.Github {
+		var r, s, e string
+		if v.Route == "" {
+			r = routePrefix + defaultRoute
+		} else {
+			r = routePrefix + v.Route
+		}
+
+		s = v.Secret
+		if s == "" {
+			s = defaultSecret
+		}
+
+		e = v.Exchange
+		if e == "" {
+			e = defaultExchange
+		}
+
+		g := github.New(r, s, e)
+
+		log.Printf("Route %s -> Github Handler", r)
 		mux.Handle(r, g)
 	}
 
