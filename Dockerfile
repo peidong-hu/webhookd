@@ -28,5 +28,6 @@ WORKDIR /
 
 COPY --from=builder /go/src/webhookd/webhookd /webhookd
 COPY --from=builder /go/src/webhookd/listener /listener
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 CMD ["/webhookd"]
