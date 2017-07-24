@@ -94,6 +94,10 @@ func (h *TravisHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 	if err != nil {
 		http.Error(writer, http.StatusText(400), 400)
 		Lg(0, "400: %s - %s (Error decoding JSON: %s)\n", reader.Method, reader.URL, err)
+
+		/* for debugging purposes */
+		print(rawPayload)
+
 		return
 	}
 
