@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     git \
-    golang-1.8-go \
+    golang-go \
     make
 
 COPY . /go/src/webhookd/
