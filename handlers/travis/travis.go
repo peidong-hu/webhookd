@@ -8,6 +8,7 @@ import (
 	. "github.com/vision-it/webhookd/logging"
 	. "github.com/vision-it/webhookd/model"
 	"github.com/vision-it/webhookd/mq"
+	"time"
 )
 
 const defaultTravisConfigServer string = "api.travis-ci.org"
@@ -18,7 +19,7 @@ type TravisHandler struct {
 	exchange string
 }
 
-func queueMessage(p travishook.WebhookPayload) string {
+func queueMessage(p travisPayload) string {
 	var m MQMessage
 	m.Version = MQMessageVersion
 	m.Repository = p.Repository.Name
