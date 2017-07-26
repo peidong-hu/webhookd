@@ -128,39 +128,8 @@ func (h *TravisHandler) ServeHTTP(writer http.ResponseWriter, reader *http.Reque
 }
 
 type travisPayload struct {
-	ID     int    `json:"id"`
-	Number string `json:"number"`
-	Config struct {
-		Sudo     bool     `json:"sudo"`
-		Language string   `json:"language"`
-		Cache    string   `json:"cache"`
-		Script   []string `json:"script"`
-		Matrix   struct {
-			FastFinish bool `json:"fast_finish"`
-			Include    []struct {
-				Rvm         string `json:"rvm"`
-				Env         string `json:"env"`
-				BundlerArgs string `json:"bundler_args"`
-				Dist        string `json:"dist"`
-				Services    string `json:"services,omitempty"`
-				Sudo        string `json:"sudo,omitempty"`
-			} `json:"include"`
-		} `json:"matrix"`
-		Notifications struct {
-			Email    bool `json:"email"`
-			Webhooks struct {
-				Urls      []string `json:"urls"`
-				OnSuccess string   `json:"on_success"`
-				OnFailure string   `json:"on_failure"`
-				OnStart   string   `json:"on_start"`
-				OnCancel  string   `json:"on_cancel"`
-				OnError   string   `json:"on_error"`
-			} `json:"webhooks"`
-		} `json:"notifications"`
-		Result string `json:".result"`
-		Group  string `json:"group"`
-		Dist   string `json:"dist"`
-	} `json:"config"`
+	ID                int         `json:"id"`
+	Number            string      `json:"number"`
 	Type              string      `json:"type"`
 	State             string      `json:"state"`
 	Status            int         `json:"status"`
@@ -174,7 +143,7 @@ type travisPayload struct {
 	CommitID          int         `json:"commit_id"`
 	Commit            string      `json:"commit"`
 	BaseCommit        string      `json:"base_commit"`
-	HeadCommit        interface{} `json:"head_commit"`
+	HeadCommit        string      `json:"head_commit"`
 	Branch            string      `json:"branch"`
 	Message           string      `json:"message"`
 	CompareURL        string      `json:"compare_url"`
@@ -185,57 +154,33 @@ type travisPayload struct {
 	CommitterEmail    string      `json:"committer_email"`
 	PullRequest       bool        `json:"pull_request"`
 	PullRequestNumber interface{} `json:"pull_request_number"`
-	PullRequestTitle  interface{} `json:"pull_request_title"`
-	Tag               interface{} `json:"tag"`
+	PullRequestTitle  string      `json:"pull_request_title"`
+	Tag               string      `json:"tag"`
 	Repository        struct {
-		ID        int         `json:"id"`
-		Name      string      `json:"name"`
-		OwnerName string      `json:"owner_name"`
-		URL       interface{} `json:"url"`
+		ID        int    `json:"id"`
+		Name      string `json:"name"`
+		OwnerName string `json:"owner_name"`
+		URL       string `json:"url"`
 	} `json:"repository"`
 	Matrix []struct {
-		ID           int    `json:"id"`
-		RepositoryID int    `json:"repository_id"`
-		ParentID     int    `json:"parent_id"`
-		Number       string `json:"number"`
-		State        string `json:"state"`
-		Config       struct {
-			Sudo          bool     `json:"sudo"`
-			Language      string   `json:"language"`
-			Cache         string   `json:"cache"`
-			Script        []string `json:"script"`
-			Notifications struct {
-				Email    bool `json:"email"`
-				Webhooks struct {
-					Urls      []string `json:"urls"`
-					OnSuccess string   `json:"on_success"`
-					OnFailure string   `json:"on_failure"`
-					OnStart   string   `json:"on_start"`
-					OnCancel  string   `json:"on_cancel"`
-					OnError   string   `json:"on_error"`
-				} `json:"webhooks"`
-			} `json:"notifications"`
-			Result      string   `json:".result"`
-			Group       string   `json:"group"`
-			Dist        string   `json:"dist"`
-			BundlerArgs string   `json:"bundler_args"`
-			Env         []string `json:"env"`
-			Rvm         string   `json:"rvm"`
-			Os          string   `json:"os"`
-		} `json:"config"`
-		Status         int         `json:"status"`
-		Result         int         `json:"result"`
-		Commit         string      `json:"commit"`
-		Branch         string      `json:"branch"`
-		Message        string      `json:"message"`
-		CompareURL     string      `json:"compare_url,omitempty"`
-		StartedAt      interface{} `json:"started_at,omitempty"`
-		FinishedAt     interface{} `json:"finished_at,omitempty"`
-		CommittedAt    time.Time   `json:"committed_at,omitempty"`
-		AuthorName     string      `json:"author_name,omitempty"`
-		AuthorEmail    string      `json:"author_email,omitempty"`
-		CommitterName  string      `json:"committer_name,omitempty"`
-		CommitterEmail string      `json:"committer_email,omitempty"`
-		AllowFailure   bool        `json:"allow_failure,omitempty"`
+		ID             int       `json:"id"`
+		RepositoryID   int       `json:"repository_id"`
+		ParentID       int       `json:"parent_id"`
+		Number         string    `json:"number"`
+		State          string    `json:"state"`
+		Status         int       `json:"status"`
+		Result         int       `json:"result"`
+		Commit         string    `json:"commit"`
+		Branch         string    `json:"branch"`
+		Message        string    `json:"message"`
+		CompareURL     string    `json:"compare_url,omitempty"`
+		StartedAt      time.Time `json:"started_at,omitempty"`
+		FinishedAt     time.Time `json:"finished_at,omitempty"`
+		CommittedAt    time.Time `json:"committed_at,omitempty"`
+		AuthorName     string    `json:"author_name,omitempty"`
+		AuthorEmail    string    `json:"author_email,omitempty"`
+		CommitterName  string    `json:"committer_name,omitempty"`
+		CommitterEmail string    `json:"committer_email,omitempty"`
+		AllowFailure   bool      `json:"allow_failure,omitempty"`
 	} `json:"matrix"`
 }
