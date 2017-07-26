@@ -8,7 +8,6 @@ import (
 	. "github.com/vision-it/webhookd/logging"
 	. "github.com/vision-it/webhookd/model"
 	"github.com/vision-it/webhookd/mq"
-	"time"
 )
 
 const defaultTravisConfigServer string = "api.travis-ci.org"
@@ -136,8 +135,8 @@ type travisPayload struct {
 	Result            int         `json:"result"`
 	StatusMessage     string      `json:"status_message"`
 	ResultMessage     string      `json:"result_message"`
-	StartedAt         time.Time   `json:"started_at"`
-	FinishedAt        time.Time   `json:"finished_at"`
+	StartedAt         interface{} `json:"started_at"`
+	FinishedAt        interface{} `json:"finished_at"`
 	Duration          int         `json:"duration"`
 	BuildURL          string      `json:"build_url"`
 	CommitID          int         `json:"commit_id"`
@@ -147,7 +146,7 @@ type travisPayload struct {
 	Branch            string      `json:"branch"`
 	Message           string      `json:"message"`
 	CompareURL        string      `json:"compare_url"`
-	CommittedAt       time.Time   `json:"committed_at"`
+	CommittedAt       interface{} `json:"committed_at"`
 	AuthorName        string      `json:"author_name"`
 	AuthorEmail       string      `json:"author_email"`
 	CommitterName     string      `json:"committer_name"`
@@ -163,24 +162,24 @@ type travisPayload struct {
 		URL       string `json:"url"`
 	} `json:"repository"`
 	Matrix []struct {
-		ID             int       `json:"id"`
-		RepositoryID   int       `json:"repository_id"`
-		ParentID       int       `json:"parent_id"`
-		Number         string    `json:"number"`
-		State          string    `json:"state"`
-		Status         int       `json:"status"`
-		Result         int       `json:"result"`
-		Commit         string    `json:"commit"`
-		Branch         string    `json:"branch"`
-		Message        string    `json:"message"`
-		CompareURL     string    `json:"compare_url,omitempty"`
-		StartedAt      time.Time `json:"started_at,omitempty"`
-		FinishedAt     time.Time `json:"finished_at,omitempty"`
-		CommittedAt    time.Time `json:"committed_at,omitempty"`
-		AuthorName     string    `json:"author_name,omitempty"`
-		AuthorEmail    string    `json:"author_email,omitempty"`
-		CommitterName  string    `json:"committer_name,omitempty"`
-		CommitterEmail string    `json:"committer_email,omitempty"`
-		AllowFailure   bool      `json:"allow_failure,omitempty"`
+		ID             int         `json:"id"`
+		RepositoryID   int         `json:"repository_id"`
+		ParentID       int         `json:"parent_id"`
+		Number         string      `json:"number"`
+		State          string      `json:"state"`
+		Status         int         `json:"status"`
+		Result         int         `json:"result"`
+		Commit         string      `json:"commit"`
+		Branch         string      `json:"branch"`
+		Message        string      `json:"message"`
+		CompareURL     string      `json:"compare_url,omitempty"`
+		StartedAt      interface{} `json:"started_at,omitempty"`
+		FinishedAt     interface{} `json:"finished_at,omitempty"`
+		CommittedAt    interface{} `json:"committed_at,omitempty"`
+		AuthorName     string      `json:"author_name,omitempty"`
+		AuthorEmail    string      `json:"author_email,omitempty"`
+		CommitterName  string      `json:"committer_name,omitempty"`
+		CommitterEmail string      `json:"committer_email,omitempty"`
+		AllowFailure   bool        `json:"allow_failure,omitempty"`
 	} `json:"matrix"`
 }
