@@ -4,6 +4,7 @@
 
 SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
+VERSION ?= $(shell git describe --always --dirty --tags)
 
 BIN ?= webhookd
 
@@ -13,7 +14,7 @@ build-dep:
 	go get -d -t ./...
 
 webhookd: $(SOURCES)
-	go build -o $(BIN)
+	go build -o $(BIN) -ldflags "-X main.VERSION=$(VERSION)"
 
 listener: listen/*.go
 	cd listen && go build -o ../listener

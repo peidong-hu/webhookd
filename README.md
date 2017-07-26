@@ -29,5 +29,8 @@ It may also serve as an example on how to implement a consumer for the message q
 
 Additionally, 'webhookd' has an integrated basic web hook for testing. It can be enabled via the config option `demo` (see `webhookd.sample.json`). An example for this can be found in the `test/demo-webhook.sh` script.
 
+## Versions
+This project uses the [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) scheme.
+
 ## License
 This software is licensed under the Expat (MIT) License. Check the `LICENSE` file.

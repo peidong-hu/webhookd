@@ -10,7 +10,10 @@ import (
 	"github.com/vision-it/webhookd/mq"
 	"log"
 	"net/http"
+	"runtime"
 )
+
+var VERSION string
 
 var CONFIG Config
 var TESTHOOK bool
@@ -21,6 +24,8 @@ func main() {
 	flag.IntVar(&VERBOSITY, "v", 1, "verbosity to use")
 	flag.BoolVar(&TESTHOOK, "testhook", true, "enable test webhook at /webhooks/test")
 	flag.Parse()
+
+	Lg(1, "Launching webhookd %s (%s) ...", VERSION, runtime.Version())
 
 	CONFIG, err := LoadConfig("./webhookd.json")
 	FailOnError(err, "Failed to load config: %s", err)
